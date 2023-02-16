@@ -21,15 +21,15 @@ pub mod vector {
             }
         }
 
-        fn x(&self) -> f64 {
+        pub fn x(&self) -> f64 {
             self.points[0]
         }
 
-        fn y(&self) -> f64 {
+        pub fn y(&self) -> f64 {
             self.points[1]
         }
 
-        fn z(&self) -> f64 {
+        pub fn z(&self) -> f64 {
             self.points[2]
         }
 
@@ -112,10 +112,6 @@ pub mod vector {
 
     pub type Point3 = Vec3;
     pub type Color = Vec3;
-
-    pub fn color(r: u16, g: u16, b: u16) -> Vec3 {
-        Vec3 { points: [f64::from(r), f64::from(g), f64::from(b)] }
-    }
 
     // utility functions
 
