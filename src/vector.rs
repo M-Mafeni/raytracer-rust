@@ -110,6 +110,14 @@ pub mod vector {
         }
     }
 
+    impl ops::Div<f64> for Vec3 {
+        type Output = Vec3;
+
+        fn div(self, rhs: f64) -> Self::Output {
+            self.scale(1.0 / rhs)
+        }
+    }
+
     pub type Point3 = Vec3;
     pub type Color = Vec3;
 
