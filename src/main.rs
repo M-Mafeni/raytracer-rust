@@ -1,28 +1,36 @@
 use std::fs::File;
 use std::io::{Write};
 
-use crate::vector::vector::{Vec3, dot_product, cross_product};
+use vector::vector::Color;
+
+use crate::ray::ray::{Ray, ray};
+use crate::vector::vector::{Vec3, dot_product, cross_product, vec3};
 use crate::writer::writer::write_color;
 
 mod vector;
 mod writer;
+mod ray;
+
+fn ray_color(ray: Ray) -> Color {
+    let unit_dir = ray.direction().unit_vector();
+    let t = 0.5 * (unit_dir.y() + 1.0);
+    (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
+}
+
 fn main() -> std::io::Result<()>{
-    const IMAGE_WIDTH: i16 = 256;
-    const IMAGE_HEIGHT: i16 = 256;
+    const ASPECT_RATIO: f64 = 16.0 / 9.0;
+    const IMAGE_WIDTH: u16 = 400;
+    const IMAGE_HEIGHT: u16 = (IMAGE_WIDTH as f32 / ASPECT_RATIO as f32) as u16;
 
-    let v1 = Vec3::new(4.0, 5.0, 6.0);
-    let v2 = Vec3::new(8.0, 7.0, 10.0);
+    // Camera
+    let viewport_height = 2.0;
+    let viewport_width = ASPECT_RATIO * viewport_height;
+    let focal_length = 1.0;
 
-    println!("v1 + v2 is {:?}", v1 + v2);
-    println!("v1 - v2 is {:?}", v1 - v2);
-    println!("v2 - v1 is {:?}", v2 - v1);
-    println!("v1 * v2 is {:?}", v1 * v2);
-    println!("v1 * 5 is {:?}", v1 * 5.0);
-    println!("5 * v1 is {:?}", 5.0 * v1);
-    println!("length of v1 is {}", v1.length());
-    println!("unit vector of v1 is {:?}", v1.unit_vector());
-    println!("v1.v2 is {:?}", dot_product(v1, v2));
-    println!("v1 X v2 is {:?}", cross_product(v1, v2));
+    let origin = vec3();
+    let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
+    let vertical = Vec3::new(0.0, viewport_height, 0.0);
+    let lower_left_corner = origin - horizontal/2.0 - vertical/2.0 - Vec3::new(0.0, 0.0, focal_length);
 
     // Create Image PPM
     let buffer = File::create("image.ppm")?;
@@ -30,11 +38,11 @@ fn main() -> std::io::Result<()>{
     for j in (0..IMAGE_HEIGHT).rev() {
         eprint!("\rScanlines Remaining: {} ", j);
         for i in 0..IMAGE_WIDTH {
-            write_color(&buffer,
-                Vec3::new(
-                    i as f64 / (IMAGE_WIDTH - 1) as f64,
-                    j as f64 / (IMAGE_HEIGHT - 1) as f64,
-                    0.25))?
+            let u = f64::from(i) / f64::from(IMAGE_WIDTH - 1);
+            let v = f64::from(j) / f64::from(IMAGE_HEIGHT - 1);
+            let r = ray(origin, lower_left_corner + u*horizontal + v*vertical - origin);
+            let pixel_color = ray_color(r);
+            write_color(&buffer, pixel_color)?
         }
     }
     eprintln!("\nDone.");
