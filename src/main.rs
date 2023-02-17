@@ -1,17 +1,29 @@
 use std::fs::File;
 use std::io::{Write};
 
-use vector::vector::Color;
+use vector::vector::{Color, Point3};
 
 use crate::ray::ray::{Ray, ray};
-use crate::vector::vector::{Vec3, dot_product, cross_product, vec3};
+use crate::vector::vector::{Vec3, dot_product, vec3};
 use crate::writer::writer::write_color;
 
 mod vector;
 mod writer;
 mod ray;
 
+fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> bool {
+    let oc = r.origin() - center;
+    let a = dot_product(r.direction(), r.direction());
+    let b = 2.0 * dot_product(oc, r.direction());
+    let c = dot_product(oc, oc) - radius * radius;
+    let discriminant = b*b - 4.0 * a * c;
+    discriminant > 0.0
+}
+
 fn ray_color(ray: Ray) -> Color {
+    if hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, &ray) {
+        return Vec3::new(1.0, 0.0, 0.0)
+    }
     let unit_dir = ray.direction().unit_vector();
     let t = 0.5 * (unit_dir.y() + 1.0);
     (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
