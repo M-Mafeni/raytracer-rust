@@ -13,14 +13,14 @@ mod ray;
 
 fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> f64 {
     let oc = r.origin() - center;
-    let a = dot_product(r.direction(), r.direction());
-    let b = 2.0 * dot_product(oc, r.direction());
-    let c = dot_product(oc, oc) - radius * radius;
-    let discriminant = b*b - 4.0 * a * c;
+    let a = r.direction().length_squared();
+    let half_b = dot_product(oc, r.direction());
+    let c = oc.length_squared() - radius * radius;
+    let discriminant = half_b*half_b - a * c;
     if discriminant < 0.0 {
         -1.0
     } else {
-        (-b - discriminant.sqrt()) / (2.0 * a)
+        (-half_b - discriminant.sqrt()) / a
     }
 }
 

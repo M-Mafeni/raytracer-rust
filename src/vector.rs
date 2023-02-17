@@ -49,9 +49,13 @@ pub mod vector {
             Vec3 { points: [p[0] * t, p[1] * t, p[2] * t] }
         }
 
-        pub fn length(&self) -> f64 {
+        pub fn length_squared(&self) -> f64 {
             let Vec3 { points } = self;
-            let t = points[0] * points[0] + points[1] * points[1] + points[2] * points[2];
+            points[0] * points[0] + points[1] * points[1] + points[2] * points[2]
+        }
+
+        pub fn length(&self) -> f64 {
+            let t = self.length_squared();
             t.sqrt()
         }
 
