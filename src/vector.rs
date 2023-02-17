@@ -1,10 +1,21 @@
 pub mod vector {
     use std::ops;
 
-    pub fn vec3() -> Vec3 {
+    pub fn zero_vector() -> Vec3 {
         Vec3 {
             points: [0.0, 0.0, 0.0]
         }
+    }
+
+    pub fn vec3(x: f64, y: f64, z: f64) -> Vec3 {
+        Vec3 {
+            points: [x, y, z]
+        }
+    }
+
+
+    pub fn unit_vector(v: Vec3) -> Vec3 {
+        v.scale(1.0 / v.length())
     }
 
 
