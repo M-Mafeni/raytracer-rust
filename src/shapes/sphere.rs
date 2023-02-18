@@ -37,8 +37,14 @@ impl Hittable for Sphere {
         }
         let t = root;
         let p = r.at(t);
-        let normal = (p - self.center) / radius;
-        Some(HitRecord{t, p, normal})
+        let outward_normal = (p - self.center) / radius;
+        // Set whether it faces backwards or forwards
+        let front_face = dot_product(r.direction(), outward_normal) < 0.0;
+        let normal = match front_face {
+            true => outward_normal,
+            _ => -1.0 * outward_normal
+        };
+        Some(HitRecord{t, p, normal, front_face})
     }
 }
 
