@@ -10,6 +10,8 @@ use crate::writer::writer::write_color;
 mod vector;
 mod writer;
 mod ray;
+mod hittable;
+mod shapes;
 
 fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> f64 {
     let oc = r.origin() - center;
