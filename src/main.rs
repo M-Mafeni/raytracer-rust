@@ -9,7 +9,7 @@ use vector::vector::{Color, random_in_unit_sphere, random_unit_vector, random_in
 use crate::camera::camera::initialise_camera;
 use crate::hittable::hittable::{HittableList, create_new_hittable_list};
 use crate::ray::ray::{Ray};
-use crate::shapes::sphere::sphere;
+use crate::world::shapes::sphere::sphere;
 use crate::utility::random::random::random_double;
 use crate::vector::vector::{Vec3, vec3, color};
 use crate::writer::writer::write_color;
@@ -18,7 +18,7 @@ mod vector;
 mod writer;
 mod ray;
 mod hittable;
-mod shapes;
+mod world;
 mod utility;
 mod camera;
 
