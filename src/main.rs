@@ -12,7 +12,7 @@ use crate::ray::{Ray};
 use crate::world::shapes::sphere::sphere;
 use crate::utility::random::random_double;
 use crate::vector::{Vec3, vec3, color};
-use crate::writer::writer::write_color;
+use crate::writer::write_color;
 
 mod vector;
 mod writer;
