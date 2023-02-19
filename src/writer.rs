@@ -6,9 +6,9 @@ pub mod writer {
     pub fn write_color<W: Write>(mut out: W, pixel_color: Color, samples_per_pixel: u16) -> Result<()> {
 
         let scale = 1.0 / f64::from(samples_per_pixel);
-        let r = pixel_color.x() * scale;
-        let g = pixel_color.y() * scale;
-        let b = pixel_color.z() * scale;
+        let r = (pixel_color.x() * scale).sqrt();
+        let g = (pixel_color.y() * scale).sqrt();
+        let b = (pixel_color.z() * scale).sqrt();
 
         writeln!(
             out,

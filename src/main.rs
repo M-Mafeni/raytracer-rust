@@ -27,7 +27,7 @@ fn ray_color<T: Hittable>(r: Ray, world: &HittableList<T>, depth: u8) -> Color {
         return color(0.0, 0.0, 0.0);
     }
 
-    if let Some(hit_record) = world.hit(&r, 0.0, INFINITY) {
+    if let Some(hit_record) = world.hit(&r, 0.001, INFINITY) {
         let target = hit_record.p + hit_record.normal + random_in_unit_sphere();
         // return 0.5 * (hit_record.normal + vec3(1.0, 1.0, 1.0))
         return 0.5 * ray_color(ray(hit_record.p, target - hit_record.p), world, depth - 1) ;
