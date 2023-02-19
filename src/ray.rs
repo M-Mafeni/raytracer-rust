@@ -1,5 +1,5 @@
 pub mod ray {
-    use crate::vector::vector::{Point3, Vec3};
+    use crate::vector::{Point3, Vec3};
 
     pub fn ray(origin: Point3, direction: Vec3) -> Ray {
         Ray { origin, direction}

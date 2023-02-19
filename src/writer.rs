@@ -1,5 +1,5 @@
 pub mod writer {
-    use crate::{vector::vector::Color, utility::math::clamp};
+    use crate::{vector::Color, utility::math::clamp};
 
     use std::io::{Result, Write};
 

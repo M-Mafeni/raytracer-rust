@@ -1,5 +1,5 @@
 pub mod hittable {
-    use crate::{vector::vector::{Point3, Vec3}, ray::ray::Ray};
+    use crate::{vector::{Point3, Vec3}, ray::ray::Ray};
 
 
     pub struct HitRecord {
