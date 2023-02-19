@@ -1,7 +1,7 @@
 pub mod vector {
     use std::ops;
 
-    use crate::utility::random::random::{random_double, random_double_range};
+    use crate::utility::random::{random_double, random_double_range};
 
     pub fn zero_vector() -> Vec3 {
         Vec3 {
