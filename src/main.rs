@@ -3,14 +3,14 @@ use std::fs::File;
 use std::io::{Write};
 
 use hittable::hittable::Hittable;
-use vector::vector::{Color, Point3};
+use vector::vector::{Color};
 
 use crate::camera::camera::initialise_camera;
 use crate::hittable::hittable::{HittableList, create_new_hittable_list};
 use crate::ray::ray::{Ray};
 use crate::shapes::sphere::sphere;
 use crate::utility::random::random::random_double;
-use crate::vector::vector::{Vec3, dot_product, vec3, color};
+use crate::vector::vector::{Vec3, vec3, color};
 use crate::writer::writer::write_color;
 
 mod vector;
@@ -20,19 +20,6 @@ mod hittable;
 mod shapes;
 mod utility;
 mod camera;
-
-fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> f64 {
-    let oc = r.origin() - center;
-    let a = r.direction().length_squared();
-    let half_b = dot_product(oc, r.direction());
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = half_b*half_b - a * c;
-    if discriminant < 0.0 {
-        -1.0
-    } else {
-        (-half_b - discriminant.sqrt()) / a
-    }
-}
 
 fn ray_color<T: Hittable>(ray: Ray, world: &HittableList<T>) -> Color {
     if let Some(hit_record) = world.hit(&ray, 0.0, INFINITY) {
