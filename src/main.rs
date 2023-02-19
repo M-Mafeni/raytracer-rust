@@ -6,7 +6,7 @@ use hittable::Hittable;
 use ray::ray;
 use vector::{Color, random_in_unit_sphere, random_unit_vector, random_in_hemisphere};
 
-use crate::camera::camera::initialise_camera;
+use crate::camera::initialise_camera;
 use crate::hittable::{HittableList, create_new_hittable_list};
 use crate::ray::{Ray};
 use crate::world::shapes::sphere::sphere;
