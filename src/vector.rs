@@ -33,6 +33,10 @@ pub mod vector {
         zero_vector()
     }
 
+    pub fn random_unit_vector() -> Vec3 {
+        unit_vector(random_in_unit_sphere())
+    }
+
     pub fn point3(x: f64, y: f64, z: f64) -> Point3 {
         Vec3 {
             points: [x, y, z]
