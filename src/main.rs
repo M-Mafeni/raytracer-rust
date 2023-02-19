@@ -16,8 +16,7 @@ mod writer;
 mod ray;
 mod hittable;
 mod shapes;
-mod math;
-mod random;
+mod utility;
 
 fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> f64 {
     let oc = r.origin() - center;
