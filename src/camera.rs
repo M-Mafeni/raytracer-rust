@@ -1,5 +1,5 @@
 pub mod camera {
-    use crate::{vector::{Point3, Vec3, vec3, point3}, ray::{ray::{Ray, ray}}};
+    use crate::{vector::{Point3, Vec3, vec3, point3}, ray::{Ray, ray}};
 
     pub struct Camera {
         origin: Point3,

@@ -14,7 +14,7 @@ pub struct Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r: &crate::ray::ray::Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &crate::ray::Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let radius = self.radius;
         let oc = r.origin() - self.center;
         let a = r.direction().length_squared();
