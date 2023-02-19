@@ -37,6 +37,15 @@ pub mod vector {
         unit_vector(random_in_unit_sphere())
     }
 
+    pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
+        let in_unit_sphere = random_in_unit_sphere();
+        if dot_product(in_unit_sphere, normal) > 0.0 { // In the same hemisphere as normal
+            in_unit_sphere
+        } else {
+            -1.0 * in_unit_sphere
+        }
+    }
+
     pub fn point3(x: f64, y: f64, z: f64) -> Point3 {
         Vec3 {
             points: [x, y, z]
