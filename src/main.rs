@@ -22,7 +22,7 @@ mod world;
 mod utility;
 mod camera;
 
-fn ray_color<T: Hittable>(r: Ray, world: &HittableList<T>, depth: u8) -> Color {
+fn ray_color(r: Ray, world: &HittableList, depth: u8) -> Color {
     if depth <= 0 {
         return color(0.0, 0.0, 0.0);
     }
@@ -47,9 +47,9 @@ fn main() -> std::io::Result<()>{
     let max_depth = 50;
 
     // World
-    let mut world: HittableList<_> = create_new_hittable_list();
-    world.objects.push(sphere(vec3(0.0, 0.0, -1.0), 0.5));
-    world.objects.push(sphere(vec3(0.0, -100.5, -1.0), 100.0));
+    let mut world: HittableList = create_new_hittable_list();
+    world.add_new_hittable(sphere(vec3(0.0, 0.0, -1.0), 0.5));
+    world.add_new_hittable(sphere(vec3(0.0, -100.5, -1.0), 100.0));
 
     // Camera
     let camera = initialise_camera();
