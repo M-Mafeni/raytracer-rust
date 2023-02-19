@@ -3,7 +3,8 @@ use std::fs::File;
 use std::io::{Write};
 
 use hittable::hittable::Hittable;
-use vector::vector::{Color};
+use ray::ray::ray;
+use vector::vector::{Color, random_in_unit_sphere};
 
 use crate::camera::camera::initialise_camera;
 use crate::hittable::hittable::{HittableList, create_new_hittable_list};
@@ -21,11 +22,17 @@ mod shapes;
 mod utility;
 mod camera;
 
-fn ray_color<T: Hittable>(ray: Ray, world: &HittableList<T>) -> Color {
-    if let Some(hit_record) = world.hit(&ray, 0.0, INFINITY) {
-        return 0.5 * (hit_record.normal + vec3(1.0, 1.0, 1.0))
+fn ray_color<T: Hittable>(r: Ray, world: &HittableList<T>, depth: u8) -> Color {
+    if depth <= 0 {
+        return color(0.0, 0.0, 0.0);
     }
-    let unit_dir = ray.direction().unit_vector();
+
+    if let Some(hit_record) = world.hit(&r, 0.0, INFINITY) {
+        let target = hit_record.p + hit_record.normal + random_in_unit_sphere();
+        // return 0.5 * (hit_record.normal + vec3(1.0, 1.0, 1.0))
+        return 0.5 * ray_color(ray(hit_record.p, target - hit_record.p), world, depth - 1) ;
+    }
+    let unit_dir = r.direction().unit_vector();
     let t = 0.5 * (unit_dir.y() + 1.0);
     (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
 }
@@ -36,6 +43,7 @@ fn main() -> std::io::Result<()>{
     const IMAGE_WIDTH: u16 = 400;
     const IMAGE_HEIGHT: u16 = (IMAGE_WIDTH as f32 / ASPECT_RATIO as f32) as u16;
     let samples_per_pixel = 100;
+    let max_depth = 50;
 
     // World
     let mut world: HittableList<_> = create_new_hittable_list();
@@ -56,7 +64,7 @@ fn main() -> std::io::Result<()>{
                 let u = (f64::from(i) + random_double()) / f64::from(IMAGE_WIDTH - 1);
                 let v = (f64::from(j) + random_double()) / f64::from(IMAGE_HEIGHT - 1);
                 let r = camera.get_ray(u, v);
-                pixel_color = pixel_color + ray_color(r, &world);
+                pixel_color = pixel_color + ray_color(r, &world, max_depth);
             }
             write_color(&buffer, pixel_color, samples_per_pixel)?
         }

@@ -1,6 +1,8 @@
 pub mod vector {
     use std::ops;
 
+    use crate::utility::random::random::{random_double, random_double_range};
+
     pub fn zero_vector() -> Vec3 {
         Vec3 {
             points: [0.0, 0.0, 0.0]
@@ -13,6 +15,23 @@ pub mod vector {
         }
     }
 
+    pub fn random() -> Vec3 {
+        vec3(random_double(), random_double(), random_double())
+    }
+
+    pub fn random_range(min: f64, max: f64) -> Vec3 {
+        vec3(random_double_range(min, max), random_double_range(min, max), random_double_range(min, max))
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        while true {
+            let p = random_range(-1.0, 1.0);
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
+        zero_vector()
+    }
 
     pub fn point3(x: f64, y: f64, z: f64) -> Point3 {
         Vec3 {
