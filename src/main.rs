@@ -3,12 +3,14 @@ use std::fs::File;
 use std::io::{Write};
 
 use hittable::hittable::Hittable;
-use vector::vector::{Color, Point3, unit_vector};
+use vector::vector::{Color, Point3};
 
+use crate::camera::camera::initialise_camera;
 use crate::hittable::hittable::{HittableList, create_new_hittable_list};
-use crate::ray::ray::{Ray, ray};
+use crate::ray::ray::{Ray};
 use crate::shapes::sphere::sphere;
-use crate::vector::vector::{Vec3, dot_product, vec3, zero_vector};
+use crate::utility::random::random::random_double;
+use crate::vector::vector::{Vec3, dot_product, vec3, color};
 use crate::writer::writer::write_color;
 
 mod vector;
@@ -42,9 +44,11 @@ fn ray_color<T: Hittable>(ray: Ray, world: &HittableList<T>) -> Color {
 }
 
 fn main() -> std::io::Result<()>{
+    // Image
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u16 = 400;
     const IMAGE_HEIGHT: u16 = (IMAGE_WIDTH as f32 / ASPECT_RATIO as f32) as u16;
+    let samples_per_pixel = 100;
 
     // World
     let mut world: HittableList<_> = create_new_hittable_list();
@@ -52,14 +56,7 @@ fn main() -> std::io::Result<()>{
     world.objects.push(sphere(vec3(0.0, -100.5, -1.0), 100.0));
 
     // Camera
-    let viewport_height = 2.0;
-    let viewport_width = ASPECT_RATIO * viewport_height;
-    let focal_length = 1.0;
-
-    let origin = zero_vector();
-    let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, viewport_height, 0.0);
-    let lower_left_corner = origin - horizontal/2.0 - vertical/2.0 - Vec3::new(0.0, 0.0, focal_length);
+    let camera = initialise_camera();
 
     // Create Image PPM
     let buffer = File::create("image.ppm")?;
@@ -67,11 +64,14 @@ fn main() -> std::io::Result<()>{
     for j in (0..IMAGE_HEIGHT).rev() {
         eprint!("\rScanlines Remaining: {} ", j);
         for i in 0..IMAGE_WIDTH {
-            let u = f64::from(i) / f64::from(IMAGE_WIDTH - 1);
-            let v = f64::from(j) / f64::from(IMAGE_HEIGHT - 1);
-            let r = ray(origin, lower_left_corner + u*horizontal + v*vertical - origin);
-            let pixel_color = ray_color(r, &world);
-            write_color(&buffer, pixel_color)?
+            let mut pixel_color: Color = color(0.0, 0.0, 0.0);
+            for _s in 0..samples_per_pixel {
+                let u = (f64::from(i) + random_double()) / f64::from(IMAGE_WIDTH - 1);
+                let v = (f64::from(j) + random_double()) / f64::from(IMAGE_HEIGHT - 1);
+                let r = camera.get_ray(u, v);
+                pixel_color = pixel_color + ray_color(r, &world);
+            }
+            write_color(&buffer, pixel_color, samples_per_pixel)?
         }
     }
     eprintln!("\nDone.");
