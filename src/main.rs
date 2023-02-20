@@ -9,7 +9,7 @@ use world::material::{Scatter, ScatterResult};
 use crate::camera::initialise_camera;
 use crate::hittable::{HittableList, create_new_hittable_list};
 use crate::ray::{Ray};
-use crate::world::material::Material;
+use crate::world::material::{Material, metal};
 use crate::world::shapes::sphere::sphere;
 use crate::utility::random::random_double;
 use crate::vector::{Vec3, vec3, color};
@@ -51,8 +51,8 @@ fn main() -> std::io::Result<()>{
     // World
     let material_ground =  Material::Lambertian { albedo: color(0.8, 0.8, 0.0) };
     let material_center =  Material::Lambertian { albedo: color(0.7, 0.3, 0.3) };
-    let material_left =  Material::Metal { albedo: color(0.8, 0.8, 0.8) };
-    let material_right =  Material::Metal { albedo: color(0.8, 0.6, 0.2) };
+    let material_left =  metal(color(0.8, 0.8, 0.8), 0.3);
+    let material_right =  metal(color(0.8, 0.6, 0.2), 1.0);
 
     let mut world: HittableList = create_new_hittable_list();
     world.add_new_hittable(sphere(vec3(0.0, -100.5, -1.0), 100.0, material_ground));
