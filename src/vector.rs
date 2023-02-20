@@ -2,6 +2,11 @@ use std::ops;
 
 use crate::utility::random::{random_double, random_double_range};
 
+#[derive(Debug, Clone, Copy)]
+pub struct Vec3 {
+    points: [f64; 3]
+}
+
 pub fn zero_vector() -> Vec3 {
     Vec3 {
         points: [0.0, 0.0, 0.0]
@@ -59,12 +64,6 @@ pub fn color(x: f64, y: f64, z: f64) -> Color {
 
 pub fn unit_vector(v: Vec3) -> Vec3 {
     v.scale(1.0 / v.length())
-}
-
-
-#[derive(Debug, Clone, Copy)]
-pub struct Vec3 {
-    points: [f64; 3]
 }
 
 impl Vec3 {
