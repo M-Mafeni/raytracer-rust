@@ -1,8 +1,9 @@
-use crate::{ray::{Ray, ray}, vector::{Color, Point3, random::random_unit_vector}};
+use crate::{ray::{Ray, ray}, vector::{Color, Point3, random::random_unit_vector, utility::{reflect, dot_product}}};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Material {
-    Lambertian {albedo: Color}
+    Lambertian {albedo: Color},
+    Metal {albedo: Color},
 }
 
 pub struct ScatterResult {
@@ -23,6 +24,15 @@ impl Scatter for Material {
                 let scatter_direction = if x.near_zero() {normal} else {x};
                 let scattered = ray(p, scatter_direction);
                 Some(ScatterResult { attenuation: *albedo, scattered })
+            },
+            Material::Metal { albedo } => {
+                let reflected = reflect(r.direction().unit_vector(), normal);
+                let scattered = ray(p, reflected);
+                if dot_product(scattered.direction(), normal) > 0.0 {
+                    Some(ScatterResult {attenuation: *albedo, scattered})
+                } else {
+                    None
+                }
             }
         }
     }

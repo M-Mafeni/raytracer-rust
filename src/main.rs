@@ -49,10 +49,17 @@ fn main() -> std::io::Result<()>{
     let max_depth = 50;
 
     // World
+    let material_ground =  Material::Lambertian { albedo: color(0.8, 0.8, 0.0) };
+    let material_center =  Material::Lambertian { albedo: color(0.7, 0.3, 0.3) };
+    let material_left =  Material::Metal { albedo: color(0.8, 0.8, 0.8) };
+    let material_right =  Material::Metal { albedo: color(0.8, 0.6, 0.2) };
+
     let mut world: HittableList = create_new_hittable_list();
-    let lambertian = Material::Lambertian { albedo: vec3(0.5, 0.5, 0.5) };
-    world.add_new_hittable(sphere(vec3(0.0, 0.0, -1.0), 0.5, lambertian));
-    world.add_new_hittable(sphere(vec3(0.0, -100.5, -1.0), 100.0, lambertian));
+    world.add_new_hittable(sphere(vec3(0.0, -100.5, -1.0), 100.0, material_ground));
+    world.add_new_hittable(sphere(vec3(0.0, 0.0, -1.0), 0.5, material_center));
+    world.add_new_hittable(sphere(vec3(-1.0, 0.0, -1.0), 0.5, material_left));
+    world.add_new_hittable(sphere(vec3(1.0, 0.0, -1.0), 0.5, material_right));
+
 
     // Camera
     let camera = initialise_camera();

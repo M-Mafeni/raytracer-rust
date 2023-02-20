@@ -21,3 +21,7 @@ pub fn cross_product(u: Vec3, v: Vec3) -> Vec3 {
         ]
     }
 }
+
+pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+    v - 2.0 * dot_product(v, n) * n
+}
