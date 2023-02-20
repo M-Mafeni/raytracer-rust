@@ -104,6 +104,11 @@ impl Vec3 {
     pub fn unit_vector(&self) -> Vec3 {
         self.scale(1.0 / self.length())
     }
+
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        self.points[0] < s && self.points[1] < s && self.points[2] < s 
+    }
 }
 
 impl ops::Add<Vec3> for Vec3 {
