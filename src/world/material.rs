@@ -1,4 +1,4 @@
-use crate::{ray::{Ray, ray}, vector::{Color, Point3, random_unit_vector}};
+use crate::{ray::{Ray, ray}, vector::{Color, Point3, random::random_unit_vector}};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Material {

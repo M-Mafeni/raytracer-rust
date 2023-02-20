@@ -1,4 +1,4 @@
-use crate::{vector::{Point3, dot_product}, hittable::{Hittable, HitRecord}, world::material::Material};
+use crate::{vector::{Point3, utility::dot_product}, hittable::{Hittable, HitRecord}, world::material::Material};
 
 
 pub fn sphere(center: Point3, radius: f64, material: Material) -> Sphere {
