@@ -1,11 +1,12 @@
-use crate::{vector::{Point3, Vec3}, ray::Ray};
+use crate::{vector::{Point3, Vec3}, ray::Ray, world::material::Material};
 
 
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
     pub t: f64,
-    pub front_face: bool
+    pub front_face: bool,
+    pub material: Material
 }
 
 pub trait Hittable {

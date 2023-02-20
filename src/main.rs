@@ -3,12 +3,13 @@ use std::fs::File;
 use std::io::{Write};
 
 use hittable::Hittable;
-use ray::ray;
-use vector::{Color, random_in_unit_sphere};
+use vector::{Color};
+use world::material::{Scatter, ScatterResult};
 
 use crate::camera::initialise_camera;
 use crate::hittable::{HittableList, create_new_hittable_list};
 use crate::ray::{Ray};
+use crate::world::material::Material;
 use crate::world::shapes::sphere::sphere;
 use crate::utility::random::random_double;
 use crate::vector::{Vec3, vec3, color};
@@ -28,10 +29,11 @@ fn ray_color(r: Ray, world: &HittableList, depth: u8) -> Color {
     }
 
     if let Some(hit_record) = world.hit(&r, 0.001, INFINITY) {
-        let target = hit_record.p + hit_record.normal + random_in_unit_sphere();
-        // let target = hit_record.p + random_in_hemisphere(hit_record.normal);
-        // return 0.5 * (hit_record.normal + vec3(1.0, 1.0, 1.0))
-        return 0.5 * ray_color(ray(hit_record.p, target - hit_record.p), world, depth - 1) ;
+        let scatter_result = hit_record.material.scatter(&r, hit_record.p, hit_record.normal, hit_record.t);
+        match scatter_result {
+            Some(ScatterResult {attenuation, scattered}) => return attenuation * ray_color(scattered, world, depth - 1),
+            None => return color(0.0, 0.0, 0.0) 
+        }
     }
     let unit_dir = r.direction().unit_vector();
     let t = 0.5 * (unit_dir.y() + 1.0);
@@ -48,8 +50,9 @@ fn main() -> std::io::Result<()>{
 
     // World
     let mut world: HittableList = create_new_hittable_list();
-    world.add_new_hittable(sphere(vec3(0.0, 0.0, -1.0), 0.5));
-    world.add_new_hittable(sphere(vec3(0.0, -100.5, -1.0), 100.0));
+    let lambertian = Material::Lambertian { albedo: vec3(0.5, 0.5, 0.5) };
+    world.add_new_hittable(sphere(vec3(0.0, 0.0, -1.0), 0.5, lambertian));
+    world.add_new_hittable(sphere(vec3(0.0, -100.5, -1.0), 100.0, lambertian));
 
     // Camera
     let camera = initialise_camera();

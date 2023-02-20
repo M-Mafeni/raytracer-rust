@@ -1,16 +1,18 @@
-use crate::{vector::{Point3, dot_product}, hittable::{Hittable, HitRecord}};
+use crate::{vector::{Point3, dot_product}, hittable::{Hittable, HitRecord}, world::material::Material};
 
 
-pub fn sphere(center: Point3, radius: f64) -> Sphere {
+pub fn sphere(center: Point3, radius: f64, material: Material) -> Sphere {
     Sphere {
         center,
-        radius
+        radius,
+        material
     }
 }
 
 pub struct Sphere {
     center: Point3,
-    radius: f64
+    radius: f64,
+    material: Material
 }
 
 impl Hittable for Sphere {
@@ -44,7 +46,7 @@ impl Hittable for Sphere {
             true => outward_normal,
             _ => -1.0 * outward_normal
         };
-        Some(HitRecord{t, p, normal, front_face})
+        Some(HitRecord{t, p, normal, front_face, material: self.material})
     }
 }
 
