@@ -12,7 +12,7 @@ use crate::ray::{Ray};
 use crate::world::material::{Material, metal};
 use crate::world::shapes::sphere::sphere;
 use crate::utility::random::random_double;
-use crate::vector::{Vec3, vec3, color};
+use crate::vector::{color, point3};
 use crate::writer::write_color;
 
 mod vector;
@@ -37,7 +37,7 @@ fn ray_color(r: Ray, world: &HittableList, depth: u8) -> Color {
     }
     let unit_dir = r.direction().unit_vector();
     let t = 0.5 * (unit_dir.y() + 1.0);
-    (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
+    (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0)
 }
 
 fn main() -> std::io::Result<()>{
@@ -55,10 +55,10 @@ fn main() -> std::io::Result<()>{
     let material_right =  metal(color(0.8, 0.6, 0.2), 1.0);
 
     let mut world: HittableList = create_new_hittable_list();
-    world.add_new_hittable(sphere(vec3(0.0, -100.5, -1.0), 100.0, material_ground));
-    world.add_new_hittable(sphere(vec3(0.0, 0.0, -1.0), 0.5, material_center));
-    world.add_new_hittable(sphere(vec3(-1.0, 0.0, -1.0), 0.5, material_left));
-    world.add_new_hittable(sphere(vec3(1.0, 0.0, -1.0), 0.5, material_right));
+    world.add_new_hittable(sphere(point3(0.0, -100.5, -1.0), 100.0, material_ground));
+    world.add_new_hittable(sphere(point3(0.0, 0.0, -1.0), 0.5, material_center));
+    world.add_new_hittable(sphere(point3(-1.0, 0.0, -1.0), 0.5, material_left));
+    world.add_new_hittable(sphere(point3(1.0, 0.0, -1.0), 0.5, material_right));
 
 
     // Camera
