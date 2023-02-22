@@ -16,12 +16,8 @@ pub struct ScatterResult {
     pub scattered: Ray
 }
 
-pub trait Scatter {
-    fn scatter(&self, r: &Ray, p: Point3, normal: Point3, t: f64) -> Option<ScatterResult>;
-}
-
-impl Scatter for Material {
-    fn scatter(&self, r: &Ray, p: Point3, normal: Point3, t: f64) -> Option<ScatterResult> {
+impl Material {
+    pub fn scatter(&self, r: &Ray, p: Point3, normal: Point3, t: f64) -> Option<ScatterResult> {
         match self {
             Material::Lambertian {albedo} => {
                 let x = normal + random_unit_vector();

@@ -4,7 +4,7 @@ use std::io::{Write};
 
 use hittable::Hittable;
 use vector::{Color};
-use world::material::{Scatter, ScatterResult};
+use world::material::ScatterResult;
 
 use crate::camera::initialise_camera;
 use crate::hittable::{HittableList, create_new_hittable_list};
