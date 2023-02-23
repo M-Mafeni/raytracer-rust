@@ -51,11 +51,9 @@ fn main() -> std::io::Result<()>{
 
     // World
     let material_ground =  Material::Lambertian { albedo: color(0.8, 0.8, 0.0) };
-    // let material_center =  Material::Lambertian { albedo: color(0.7, 0.3, 0.3) };
-    // let material_left =  metal(color(0.8, 0.8, 0.8), 0.3);
-    let material_center = Material::Dielectric { refraction_index: 1.5 };
+    let material_center =  Material::Lambertian { albedo: color(0.1, 0.2, 0.5) };
     let material_left =  Material::Dielectric { refraction_index: 1.5 };
-    let material_right =  metal(color(0.8, 0.6, 0.2), 1.0);
+    let material_right =  metal(color(0.8, 0.6, 0.2), 0.0);
 
     let mut world: HittableList = create_new_hittable_list();
     world.add_new_hittable(sphere(point3(0.0, -100.5, -1.0), 100.0, material_ground));

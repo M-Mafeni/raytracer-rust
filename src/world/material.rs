@@ -39,10 +39,19 @@ impl Material {
             Material::Dielectric { refraction_index } => {
                 let refraction_ratio = if front_face {1.0/refraction_index} else {*refraction_index};
                 let unit_direction = r.direction().unit_vector();
-                let refracted = refract(unit_direction, normal, refraction_ratio);
+
+                let cos_theta = dot_product(-unit_direction, normal).min(1.0);
+                let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+
+                let cannot_refract = refraction_ratio * sin_theta > 1.0;
+                let direction = if cannot_refract {
+                    reflect(unit_direction, normal)
+                } else {
+                    refract(unit_direction, normal, refraction_ratio)
+                };
 
                 let attenuation = color(1.0, 1.0, 1.0);
-                let scattered = ray(p, refracted);
+                let scattered = ray(p, direction);
                 Some(ScatterResult {attenuation, scattered})
             }
         }
