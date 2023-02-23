@@ -69,3 +69,10 @@ impl ops::Div<f64> for Vec3 {
         self.scale(1.0 / rhs)
     }
 }
+
+impl ops::Neg for Vec3 {
+    type Output = Vec3;
+    fn neg(self) -> Self::Output {
+        -1.0 * self
+    }
+}
