@@ -1,4 +1,4 @@
-use crate::{ray::{Ray, ray}, vector::{Color, Point3, random::{random_unit_vector, random_in_unit_sphere}, utility::{reflect, dot_product, refract}, color}};
+use crate::{ray::{Ray, ray}, vector::{Color, Point3, random::{random_unit_vector, random_in_unit_sphere}, utility::{reflect, dot_product, refract}, color}, utility::random::random_double};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Material {
@@ -15,6 +15,13 @@ pub fn metal(albedo: Color, f: f64) -> Material {
 pub struct ScatterResult {
     pub attenuation: Color,
     pub scattered: Ray
+}
+
+fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
+    // Use Schlick's approximation for reflectance.
+    let x = (1.0 - ref_idx) / (1.0 + ref_idx);
+    let r0 = x * x;
+    r0 + (1.0 - r0)* (1.0 - cosine).powi(5)
 }
 
 impl Material {
@@ -44,7 +51,7 @@ impl Material {
                 let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
                 let cannot_refract = refraction_ratio * sin_theta > 1.0;
-                let direction = if cannot_refract {
+                let direction = if cannot_refract || reflectance(cos_theta, refraction_ratio) > random_double() {
                     reflect(unit_direction, normal)
                 } else {
                     refract(unit_direction, normal, refraction_ratio)
