@@ -30,7 +30,7 @@ fn ray_color(r: Ray, world: &HittableList, depth: u8) -> Color {
     }
 
     if let Some(hit_record) = world.hit(&r, 0.001, INFINITY) {
-        let scatter_result = hit_record.material.scatter(&r, hit_record.p, hit_record.normal, hit_record.t);
+        let scatter_result = hit_record.material.scatter(&r, hit_record.p, hit_record.normal, hit_record.front_face, hit_record.t);
         match scatter_result {
             Some(ScatterResult {attenuation, scattered}) => return attenuation * ray_color(scattered, world, depth - 1),
             None => return color(0.0, 0.0, 0.0) 
@@ -51,8 +51,10 @@ fn main() -> std::io::Result<()>{
 
     // World
     let material_ground =  Material::Lambertian { albedo: color(0.8, 0.8, 0.0) };
-    let material_center =  Material::Lambertian { albedo: color(0.7, 0.3, 0.3) };
-    let material_left =  metal(color(0.8, 0.8, 0.8), 0.3);
+    // let material_center =  Material::Lambertian { albedo: color(0.7, 0.3, 0.3) };
+    // let material_left =  metal(color(0.8, 0.8, 0.8), 0.3);
+    let material_center = Material::Dielectric { refraction_index: 1.5 };
+    let material_left =  Material::Dielectric { refraction_index: 1.5 };
     let material_right =  metal(color(0.8, 0.6, 0.2), 1.0);
 
     let mut world: HittableList = create_new_hittable_list();

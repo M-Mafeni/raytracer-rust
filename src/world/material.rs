@@ -1,9 +1,10 @@
-use crate::{ray::{Ray, ray}, vector::{Color, Point3, random::{random_unit_vector, random_in_unit_sphere}, utility::{reflect, dot_product}}};
+use crate::{ray::{Ray, ray}, vector::{Color, Point3, random::{random_unit_vector, random_in_unit_sphere}, utility::{reflect, dot_product, refract}, color}};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Material {
     Lambertian {albedo: Color},
     Metal {albedo: Color, fuzz: f64},
+    Dielectric {refraction_index: f64}
 }
 
 pub fn metal(albedo: Color, f: f64) -> Material {
@@ -17,7 +18,7 @@ pub struct ScatterResult {
 }
 
 impl Material {
-    pub fn scatter(&self, r: &Ray, p: Point3, normal: Point3, t: f64) -> Option<ScatterResult> {
+    pub fn scatter(&self, r: &Ray, p: Point3, normal: Point3, front_face: bool, t: f64) -> Option<ScatterResult> {
         match self {
             Material::Lambertian {albedo} => {
                 let x = normal + random_unit_vector();
@@ -34,6 +35,15 @@ impl Material {
                 } else {
                     None
                 }
+            },
+            Material::Dielectric { refraction_index } => {
+                let refraction_ratio = if front_face {1.0/refraction_index} else {*refraction_index};
+                let unit_direction = r.direction().unit_vector();
+                let refracted = refract(unit_direction, normal, refraction_ratio);
+
+                let attenuation = color(1.0, 1.0, 1.0);
+                let scattered = ray(p, refracted);
+                Some(ScatterResult {attenuation, scattered})
             }
         }
     }
