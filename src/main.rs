@@ -1,6 +1,7 @@
 use std::f64::INFINITY;
 use std::fs::File;
 use std::io::{Write};
+use std::time::Instant;
 
 use hittable::Hittable;
 use vector::{Color};
@@ -64,6 +65,7 @@ fn main() -> std::io::Result<()>{
     // Camera
     let camera = initialise_camera();
 
+    let now = Instant::now();
     // Create Image PPM
     let buffer = File::create("image.ppm")?;
     writeln!(&buffer, "P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT)?;
@@ -80,6 +82,7 @@ fn main() -> std::io::Result<()>{
             write_color(&buffer, pixel_color, samples_per_pixel)?
         }
     }
+    eprintln!("\nTime taken {:?}", Instant::now() - now);
     eprintln!("\nDone.");
     Ok(())
     
