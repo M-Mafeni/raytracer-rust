@@ -1,4 +1,5 @@
 use std::f64::INFINITY;
+use std::f64::consts::PI;
 use std::fs::File;
 use std::io::{Write};
 use std::time::Instant;
@@ -7,7 +8,7 @@ use hittable::Hittable;
 use vector::{Color};
 use world::material::ScatterResult;
 
-use crate::camera::initialise_camera;
+use crate::camera::{initialise_camera, cam};
 use crate::hittable::{HittableList, create_new_hittable_list};
 use crate::ray::{Ray};
 use crate::world::material::{Material, metal};
@@ -49,22 +50,27 @@ fn main() -> std::io::Result<()>{
     let samples_per_pixel = 100;
     let max_depth = 50;
 
+    let r = (PI / 4.0).cos();
     // World
-    let material_ground =  Material::Lambertian { albedo: color(0.8, 0.8, 0.0) };
-    let material_center =  Material::Lambertian { albedo: color(0.1, 0.2, 0.5) };
-    let material_left =  Material::Dielectric { refraction_index: 1.5 };
-    let material_right =  metal(color(0.8, 0.6, 0.2), 0.0);
+    let material_left = Material:: Lambertian { albedo: color(0.0, 0.0, 1.0) };
+    let material_right = Material:: Lambertian { albedo: color(1.0, 0.0, 0.0) };
+    // let material_ground =  Material::Lambertian { albedo: color(0.8, 0.8, 0.0) };
+    // let material_center =  Material::Lambertian { albedo: color(0.1, 0.2, 0.5) };
+    // let material_left =  Material::Dielectric { refraction_index: 1.5 };
+    // let material_right =  metal(color(0.8, 0.6, 0.2), 0.0);
 
     let mut world: HittableList = create_new_hittable_list();
-    world.add_new_hittable(sphere(point3(0.0, -100.5, -1.0), 100.0, material_ground));
-    world.add_new_hittable(sphere(point3(0.0, 0.0, -1.0), 0.5, material_center));
-    world.add_new_hittable(sphere(point3(-1.0, 0.0, -1.0), 0.5, material_left));
-    world.add_new_hittable(sphere(point3(-1.0, 0.0, -1.0), -0.4, material_left));
-    world.add_new_hittable(sphere(point3(1.0, 0.0, -1.0), 0.5, material_right));
+    world.add_new_hittable(sphere(point3(-r, 0.0, -1.0), r, material_left));
+    world.add_new_hittable(sphere(point3(r, 0.0, -1.0), r, material_right));
+    // world.add_new_hittable(sphere(point3(0.0, -100.5, -1.0), 100.0, material_ground));
+    // world.add_new_hittable(sphere(point3(0.0, 0.0, -1.0), 0.5, material_center));
+    // world.add_new_hittable(sphere(point3(-1.0, 0.0, -1.0), 0.5, material_left));
+    // world.add_new_hittable(sphere(point3(-1.0, 0.0, -1.0), -0.4, material_left));
+    // world.add_new_hittable(sphere(point3(1.0, 0.0, -1.0), 0.5, material_right));
 
 
     // Camera
-    let camera = initialise_camera();
+    let camera = cam(90.0, ASPECT_RATIO);
 
     let now = Instant::now();
     // Create Image PPM
