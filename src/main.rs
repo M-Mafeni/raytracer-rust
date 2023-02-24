@@ -65,7 +65,7 @@ fn main() -> std::io::Result<()>{
 
 
     // Camera
-    let camera = cam(point3(-2.0, 2.0, 1.0),point3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), 90.0, ASPECT_RATIO);
+    let camera = cam(point3(-2.0, 2.0, 1.0),point3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), 20.0, ASPECT_RATIO);
 
     let now = Instant::now();
     // Create Image PPM
