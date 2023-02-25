@@ -7,11 +7,11 @@ use hittable::Hittable;
 use utility::random::random_double_range;
 use vector::{Color};
 use world::material::ScatterResult;
-use world::shapes::sphere;
 
 use crate::camera::{cam};
 use crate::hittable::{HittableList, create_new_hittable_list};
 use crate::parser::material::parse_materials;
+use crate::parser::triangle::parse_triangles;
 use crate::ray::{Ray};
 use crate::world::material::{Material, metal};
 use crate::world::shapes::sphere::sphere;
@@ -117,6 +117,8 @@ fn main() -> std::io::Result<()>{
     let world = random_scene();
 
     println!("Materials: {:?}", parse_materials("data/cornell-box.mtl"));
+    let material_map = parse_materials("data/cornell-box.mtl");
+    println!("Triangles: {:?}", parse_triangles("data/cornell-box.obj", material_map));
 
     // Camera
     let look_from = point3(13.0, 2.0, 3.0);
