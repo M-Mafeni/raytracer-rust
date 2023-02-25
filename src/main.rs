@@ -11,6 +11,7 @@ use world::shapes::sphere;
 
 use crate::camera::{cam};
 use crate::hittable::{HittableList, create_new_hittable_list};
+use crate::parser::material::parse_materials;
 use crate::ray::{Ray};
 use crate::world::material::{Material, metal};
 use crate::world::shapes::sphere::sphere;
@@ -25,6 +26,7 @@ mod hittable;
 mod world;
 mod utility;
 mod camera;
+mod parser;
 
 
 fn random_scene() -> HittableList {
@@ -114,6 +116,7 @@ fn main() -> std::io::Result<()>{
     // world.add_new_hittable(sphere(point3(1.0, 0.0, -1.0), 0.5, material_right));
     let world = random_scene();
 
+    println!("Materials: {:?}", parse_materials("data/cornell-box.mtl"));
 
     // Camera
     let look_from = point3(13.0, 2.0, 3.0);
