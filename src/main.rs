@@ -1,5 +1,4 @@
 use std::f64::INFINITY;
-use std::f64::consts::PI;
 use std::fs::File;
 use std::io::{Write};
 use std::time::Instant;
@@ -8,7 +7,7 @@ use hittable::Hittable;
 use vector::{Color};
 use world::material::ScatterResult;
 
-use crate::camera::{initialise_camera, cam};
+use crate::camera::{cam};
 use crate::hittable::{HittableList, create_new_hittable_list};
 use crate::ray::{Ray};
 use crate::world::material::{Material, metal};
@@ -65,7 +64,12 @@ fn main() -> std::io::Result<()>{
 
 
     // Camera
-    let camera = cam(point3(-2.0, 2.0, 1.0),point3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), 20.0, ASPECT_RATIO);
+    let look_from = point3(3.0, 3.0, 2.0);
+    let look_at = point3(0.0, 0.0, -1.0);
+    let vup = vec3(0.0, 1.0, 0.0);
+    let dist_to_focus = (look_from - look_at).length();
+    let aperture = 2.0;
+    let camera = cam(look_from, look_at, vup, 20.0, ASPECT_RATIO, aperture, dist_to_focus);
 
     let now = Instant::now();
     // Create Image PPM
