@@ -96,37 +96,27 @@ fn ray_color(r: Ray, world: &HittableList, depth: u8) -> Color {
 
 fn main() -> std::io::Result<()>{
     // Image
-    const ASPECT_RATIO: f64 = 3.0 / 2.0;
-    const IMAGE_WIDTH: u16 = 1200;
+    const ASPECT_RATIO: f64 = 16.0 / 9.0;
+    const IMAGE_WIDTH: u16 = 400;
     const IMAGE_HEIGHT: u16 = (IMAGE_WIDTH as f32 / ASPECT_RATIO as f32) as u16;
     let samples_per_pixel = 100;
     let max_depth = 50;
 
     // World
-    // let material_ground =  Material::Lambertian { albedo: color(0.8, 0.8, 0.0) };
-    // let material_center =  Material::Lambertian { albedo: color(0.1, 0.2, 0.5) };
-    // let material_left =  Material::Dielectric { refraction_index: 1.5 };
-    // let material_right =  metal(color(0.8, 0.6, 0.2), 0.0);
-
-    // let mut world: HittableList = create_new_hittable_list();
-    // world.add_new_hittable(sphere(point3(0.0, -100.5, -1.0), 100.0, material_ground));
-    // world.add_new_hittable(sphere(point3(0.0, 0.0, -1.0), 0.5, material_center));
-    // world.add_new_hittable(sphere(point3(-1.0, 0.0, -1.0), 0.5, material_left));
-    // world.add_new_hittable(sphere(point3(-1.0, 0.0, -1.0), -0.45, material_left));
-    // world.add_new_hittable(sphere(point3(1.0, 0.0, -1.0), 0.5, material_right));
-    let world = random_scene();
-
-    println!("Materials: {:?}", parse_materials("data/cornell-box.mtl"));
     let material_map = parse_materials("data/cornell-box.mtl");
-    println!("Triangles: {:?}", parse_triangles("data/cornell-box.obj", material_map));
+    let cornell_box = parse_triangles("data/cornell-box.obj", material_map);
+    let mut world: HittableList = create_new_hittable_list();
+    for t in cornell_box {
+        world.add_new_hittable(t);
+    }
 
     // Camera
-    let look_from = point3(13.0, 2.0, 3.0);
-    let look_at = point3(0.0, 0.0, 0.0);
+    let look_from = point3(-0.2, 2.58, 2.5);
+    let look_at = point3(-0.2, 2.58, -6.0);
     let vup = vec3(0.0, 1.0, 0.0);
-    let dist_to_focus = 10.0;
-    let aperture = 0.1;
-    let camera = cam(look_from, look_at, vup, 20.0, ASPECT_RATIO, aperture, dist_to_focus);
+    let dist_to_focus = 1.0;
+    let aperture = 0.0;
+    let camera = cam(look_from, look_at, vup, 90.0, ASPECT_RATIO, aperture, dist_to_focus);
 
     let now = Instant::now();
     // Create Image PPM
