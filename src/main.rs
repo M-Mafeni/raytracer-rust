@@ -89,28 +89,20 @@ fn ray_color(r: Ray, world: &HittableList, depth: u8, light_opt: &Option<Light>)
     let t_max = INFINITY;
 
     if let Some(hit_record) = world.hit(&r, t_min, t_max) {
-        let get_colour = |mat, light_colour| {
-            match mat {
-                Material::Lambertian { albedo } => return albedo * light_colour,
-                // Ignore other materials for now
-                _ => return zero_vector()
-            }
+        let scatter_result = hit_record.material.scatter(&r, hit_record.p, hit_record.normal, hit_record.front_face, hit_record.t);
+        let c = match scatter_result {
+            Some(ScatterResult {attenuation, scattered}) => attenuation * ray_color(scattered, world, depth - 1, light_opt),
+            None => color(0.0, 0.0, 0.0) 
         };
         match light_opt {
-            None => {
-                let scatter_result = hit_record.material.scatter(&r, hit_record.p, hit_record.normal, hit_record.front_face, hit_record.t);
-                match scatter_result {
-                    Some(ScatterResult {attenuation, scattered}) => return attenuation * ray_color(scattered, world, depth - 1, light_opt),
-                    None => return color(0.0, 0.0, 0.0) 
-                }
-            },
+            None => return c,
             Some(Light{position, colour}) => {
                 let dir = *position - hit_record.p;
                 let dist = dir.length();
                 let shadow_ray = ray(hit_record.p, dir.unit_vector());
                 match world.hit(&shadow_ray, t_min, dist) {
-                    None => return  get_colour(hit_record.material, *colour),
-                    _ => return zero_vector(),
+                    None => return *colour * c,
+                    _ => return 0.2 * c,
                 }
             }
         }
@@ -125,7 +117,7 @@ fn main() -> std::io::Result<()>{
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u16 = 400;
     const IMAGE_HEIGHT: u16 = (IMAGE_WIDTH as f32 / ASPECT_RATIO as f32) as u16;
-    let samples_per_pixel = 25;
+    let samples_per_pixel = 50;
     let max_depth = 50;
 
     // World
