@@ -89,10 +89,11 @@ fn ray_color(r: Ray, world: &HittableList, depth: u8, light_opt: &Option<Light>)
     let t_max = INFINITY;
 
     if let Some(hit_record) = world.hit(&r, t_min, t_max) {
+        let emitted: Color = hit_record.material.emit();
         let scatter_result = hit_record.material.scatter(&r, hit_record.p, hit_record.normal, hit_record.front_face, hit_record.t);
         let c = match scatter_result {
-            Some(ScatterResult {attenuation, scattered}) => attenuation * ray_color(scattered, world, depth - 1, light_opt),
-            None => color(0.0, 0.0, 0.0) 
+            Some(ScatterResult {attenuation, scattered}) => emitted + attenuation * ray_color(scattered, world, depth - 1, light_opt),
+            None => emitted
         };
         match light_opt {
             None => return c,
@@ -107,9 +108,10 @@ fn ray_color(r: Ray, world: &HittableList, depth: u8, light_opt: &Option<Light>)
             }
         }
     }
-    let unit_dir = r.direction().unit_vector();
-    let t = 0.5 * (unit_dir.y() + 1.0);
-    (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0)
+    // let unit_dir = r.direction().unit_vector();
+    // let t = 0.5 * (unit_dir.y() + 1.0);
+    // (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0)
+    zero_vector()
 }
 
 fn main() -> std::io::Result<()>{
@@ -117,15 +119,21 @@ fn main() -> std::io::Result<()>{
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u16 = 400;
     const IMAGE_HEIGHT: u16 = (IMAGE_WIDTH as f32 / ASPECT_RATIO as f32) as u16;
-    let samples_per_pixel = 50;
+    let samples_per_pixel = 400;
     let max_depth = 50;
 
     // World
     let material_map = parse_materials("data/cornell-box.mtl");
     let cornell_box = parse_triangles("data/cornell-box.obj", material_map);
     let mut world: HittableList = create_new_hittable_list();
-    for t in cornell_box {
-        world.add_new_hittable(t);
+    for entry in cornell_box {
+        for t in entry.1 {
+            let mut triangle = t;
+            if entry.0 == "light" {
+                triangle.set_material(Material::DiffuseLight { value: 10.0 * color(1.0, 1.0, 1.0) });
+            }
+            world.add_new_hittable(triangle);
+        }
     }
 
     // Camera
@@ -135,8 +143,8 @@ fn main() -> std::io::Result<()>{
     let dist_to_focus = 1.0;
     let aperture = 0.0;
     let camera = cam(look_from, look_at, vup, 90.0, ASPECT_RATIO, aperture, dist_to_focus);
-    let light = light(point3(-0.23, 4.8, -3.0343), color(1.0, 1.0, 1.0));
-    let light_opt = Some(light);
+    // let light = light(point3(-0.23, 4.8, -3.0343), color(1.0, 1.0, 1.0));
+    // let light_opt = Some(light);
     let now = Instant::now();
     // Create Image PPM
     let buffer = File::create("image.ppm")?;
@@ -149,7 +157,7 @@ fn main() -> std::io::Result<()>{
                 let u = (f64::from(i) + random_double()) / f64::from(IMAGE_WIDTH - 1);
                 let v = (f64::from(j) + random_double()) / f64::from(IMAGE_HEIGHT - 1);
                 let r = camera.get_ray(u, v);
-                pixel_color = pixel_color + ray_color(r, &world, max_depth, &light_opt);
+                pixel_color = pixel_color + ray_color(r, &world, max_depth, &None);
             }
             write_color(&buffer, pixel_color, samples_per_pixel)?
         }

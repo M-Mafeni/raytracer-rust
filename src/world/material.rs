@@ -1,10 +1,11 @@
-use crate::{ray::{Ray, ray}, vector::{Color, Point3, random::{random_unit_vector, random_in_unit_sphere}, utility::{reflect, dot_product, refract}, color}, utility::random::random_double};
+use crate::{ray::{Ray, ray}, vector::{Color, Point3, random::{random_unit_vector, random_in_unit_sphere}, utility::{reflect, dot_product, refract}, color, zero_vector}, utility::random::random_double};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Material {
     Lambertian {albedo: Color},
     Metal {albedo: Color, fuzz: f64},
-    Dielectric {refraction_index: f64}
+    Dielectric {refraction_index: f64},
+    DiffuseLight {value: Color}
 }
 
 pub fn metal(albedo: Color, f: f64) -> Material {
@@ -60,7 +61,15 @@ impl Material {
                 let attenuation = color(1.0, 1.0, 1.0);
                 let scattered = ray(p, direction);
                 Some(ScatterResult {attenuation, scattered})
-            }
+            },
+            Material::DiffuseLight { value } => None 
+        }
+    }
+
+    pub fn emit(&self) -> Color {
+        match self {
+            Material::DiffuseLight { value } => *value ,
+            _ => zero_vector()
         }
     }
 }

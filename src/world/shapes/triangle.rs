@@ -12,6 +12,12 @@ pub fn triangle(a: Point3, b: Point3, c: Point3, material: Material) -> Triangle
     Triangle { a, b, c, material }
 }
 
+impl Triangle {
+    pub fn set_material(&mut self, material: Material) {
+        self.material = material;
+    }
+}
+
 impl Hittable for Triangle {
     fn hit(&self, r: &crate::ray::Ray, t_min: f64, t_max: f64) -> Option<crate::hittable::HitRecord> {
         // TODO Implement
