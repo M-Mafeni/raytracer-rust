@@ -4,8 +4,10 @@ use std::io::{Write};
 use std::time::Instant;
 
 use hittable::Hittable;
+use ray::ray;
 use utility::random::random_double_range;
-use vector::{Color};
+use vector::{Color, zero_vector};
+use world::light::Light;
 use world::material::ScatterResult;
 
 use crate::camera::{cam};
@@ -13,6 +15,7 @@ use crate::hittable::{HittableList, create_new_hittable_list};
 use crate::parser::material::parse_materials;
 use crate::parser::triangle::parse_triangles;
 use crate::ray::{Ray};
+use crate::world::light::light;
 use crate::world::material::{Material, metal};
 use crate::world::shapes::sphere::sphere;
 use crate::utility::random::random_double;
@@ -77,16 +80,39 @@ fn random_scene() -> HittableList {
     world
 }
 
-fn ray_color(r: Ray, world: &HittableList, depth: u8) -> Color {
+fn ray_color(r: Ray, world: &HittableList, depth: u8, light_opt: &Option<Light>) -> Color {
     if depth <= 0 {
         return color(0.0, 0.0, 0.0);
     }
 
-    if let Some(hit_record) = world.hit(&r, 0.001, INFINITY) {
-        let scatter_result = hit_record.material.scatter(&r, hit_record.p, hit_record.normal, hit_record.front_face, hit_record.t);
-        match scatter_result {
-            Some(ScatterResult {attenuation, scattered}) => return attenuation * ray_color(scattered, world, depth - 1),
-            None => return color(0.0, 0.0, 0.0) 
+    let t_min = 0.01;
+    let t_max = INFINITY;
+
+    if let Some(hit_record) = world.hit(&r, t_min, t_max) {
+        let get_colour = |mat, light_colour| {
+            match mat {
+                Material::Lambertian { albedo } => return albedo * light_colour,
+                // Ignore other materials for now
+                _ => return zero_vector()
+            }
+        };
+        match light_opt {
+            None => {
+                let scatter_result = hit_record.material.scatter(&r, hit_record.p, hit_record.normal, hit_record.front_face, hit_record.t);
+                match scatter_result {
+                    Some(ScatterResult {attenuation, scattered}) => return attenuation * ray_color(scattered, world, depth - 1, light_opt),
+                    None => return color(0.0, 0.0, 0.0) 
+                }
+            },
+            Some(Light{position, colour}) => {
+                let dir = *position - hit_record.p;
+                let dist = dir.length();
+                let shadow_ray = ray(hit_record.p, dir.unit_vector());
+                match world.hit(&shadow_ray, t_min, dist) {
+                    None => return  get_colour(hit_record.material, *colour),
+                    _ => return zero_vector(),
+                }
+            }
         }
     }
     let unit_dir = r.direction().unit_vector();
@@ -99,7 +125,7 @@ fn main() -> std::io::Result<()>{
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u16 = 400;
     const IMAGE_HEIGHT: u16 = (IMAGE_WIDTH as f32 / ASPECT_RATIO as f32) as u16;
-    let samples_per_pixel = 100;
+    let samples_per_pixel = 25;
     let max_depth = 50;
 
     // World
@@ -117,7 +143,8 @@ fn main() -> std::io::Result<()>{
     let dist_to_focus = 1.0;
     let aperture = 0.0;
     let camera = cam(look_from, look_at, vup, 90.0, ASPECT_RATIO, aperture, dist_to_focus);
-
+    let light = light(point3(-0.23, 4.8, -3.0343), color(1.0, 1.0, 1.0));
+    let light_opt = Some(light);
     let now = Instant::now();
     // Create Image PPM
     let buffer = File::create("image.ppm")?;
@@ -130,7 +157,7 @@ fn main() -> std::io::Result<()>{
                 let u = (f64::from(i) + random_double()) / f64::from(IMAGE_WIDTH - 1);
                 let v = (f64::from(j) + random_double()) / f64::from(IMAGE_HEIGHT - 1);
                 let r = camera.get_ray(u, v);
-                pixel_color = pixel_color + ray_color(r, &world, max_depth);
+                pixel_color = pixel_color + ray_color(r, &world, max_depth, &light_opt);
             }
             write_color(&buffer, pixel_color, samples_per_pixel)?
         }
