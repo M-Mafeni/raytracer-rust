@@ -95,18 +95,19 @@ fn ray_color(r: Ray, world: &HittableList, depth: u8, light_opt: &Option<Light>)
             Some(ScatterResult {attenuation, scattered}) => emitted + attenuation * ray_color(scattered, world, depth - 1, light_opt),
             None => emitted
         };
-        match light_opt {
-            None => return c,
-            Some(Light{position, colour}) => {
-                let dir = *position - hit_record.p;
-                let dist = dir.length();
-                let shadow_ray = ray(hit_record.p, dir.unit_vector());
-                match world.hit(&shadow_ray, t_min, dist) {
-                    None => return *colour * c,
-                    _ => return 0.2 * c,
-                }
-            }
-        }
+        return c;
+        // match light_opt {
+        //     None => return c,
+        //     Some(Light{position, colour}) => {
+        //         let dir = *position - hit_record.p;
+        //         let dist = dir.length();
+        //         let shadow_ray = ray(hit_record.p, dir.unit_vector());
+        //         match world.hit(&shadow_ray, t_min, dist) {
+        //             None => return *colour * c,
+        //             _ => return 0.2 * c,
+        //         }
+        //     }
+        // }
     }
     // let unit_dir = r.direction().unit_vector();
     // let t = 0.5 * (unit_dir.y() + 1.0);
@@ -119,7 +120,7 @@ fn main() -> std::io::Result<()>{
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u16 = 400;
     const IMAGE_HEIGHT: u16 = (IMAGE_WIDTH as f32 / ASPECT_RATIO as f32) as u16;
-    let samples_per_pixel = 400;
+    let samples_per_pixel = 500;
     let max_depth = 50;
 
     // World
@@ -130,11 +131,17 @@ fn main() -> std::io::Result<()>{
         for t in entry.1 {
             let mut triangle = t;
             if entry.0 == "light" {
-                triangle.set_material(Material::DiffuseLight { value: 10.0 * color(1.0, 1.0, 1.0) });
+                triangle.set_material(Material::DiffuseLight { value: 20.0 * color(1.0, 1.0, 1.0) });
+            } else if entry.0 == "back_wall" {
+                triangle.set_material(Material::Metal { albedo: color(1.0, 1.0, 1.0), fuzz: 0.0 })
             }
             world.add_new_hittable(triangle);
         }
     }
+    let sphere_1 = sphere(point3(-1.0, 1.3, 0.0), 0.5, Material::Dielectric { refraction_index: 1.5 });
+    let sphere_2 = sphere(point3(-1.0, 1.3, 0.0), -0.4,Material::Dielectric { refraction_index: 1.5 });
+    world.add_new_hittable(sphere_1);
+    world.add_new_hittable(sphere_2);
 
     // Camera
     let look_from = point3(-0.2, 2.58, 2.5);
@@ -143,8 +150,8 @@ fn main() -> std::io::Result<()>{
     let dist_to_focus = 1.0;
     let aperture = 0.0;
     let camera = cam(look_from, look_at, vup, 90.0, ASPECT_RATIO, aperture, dist_to_focus);
-    // let light = light(point3(-0.23, 4.8, -3.0343), color(1.0, 1.0, 1.0));
-    // let light_opt = Some(light);
+    let light = light(point3(-0.23, 4.8, -3.0343), color(1.0, 1.0, 1.0));
+    let light_opt = Some(light);
     let now = Instant::now();
     // Create Image PPM
     let buffer = File::create("image.ppm")?;
@@ -157,7 +164,7 @@ fn main() -> std::io::Result<()>{
                 let u = (f64::from(i) + random_double()) / f64::from(IMAGE_WIDTH - 1);
                 let v = (f64::from(j) + random_double()) / f64::from(IMAGE_HEIGHT - 1);
                 let r = camera.get_ray(u, v);
-                pixel_color = pixel_color + ray_color(r, &world, max_depth, &None);
+                pixel_color = pixel_color + ray_color(r, &world, max_depth, &light_opt);
             }
             write_color(&buffer, pixel_color, samples_per_pixel)?
         }
