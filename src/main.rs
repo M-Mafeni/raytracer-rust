@@ -120,7 +120,7 @@ fn main() -> std::io::Result<()>{
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u16 = 400;
     const IMAGE_HEIGHT: u16 = (IMAGE_WIDTH as f32 / ASPECT_RATIO as f32) as u16;
-    let samples_per_pixel = 500;
+    let samples_per_pixel = 1000;
     let max_depth = 50;
 
     // World
@@ -133,7 +133,7 @@ fn main() -> std::io::Result<()>{
             if entry.0 == "light" {
                 triangle.set_material(Material::DiffuseLight { value: 20.0 * color(1.0, 1.0, 1.0) });
             } else if entry.0 == "back_wall" {
-                triangle.set_material(Material::Metal { albedo: color(1.0, 1.0, 1.0), fuzz: 0.0 })
+                triangle.set_material(Material::Metal { albedo: color(0.8, 0.8, 0.8), fuzz: 0.0 })
             }
             world.add_new_hittable(triangle);
         }
